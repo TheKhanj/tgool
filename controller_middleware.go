@@ -2,10 +2,10 @@ package tgool
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/sirupsen/logrus"
 	"github.com/thekhanj/drouter"
 )
 
@@ -72,7 +72,7 @@ func (m *ControllerMiddleware) callMethod(
 		return chattable
 	}
 
-	logrus.Debug("result of controller is not being handled")
+	log.Println("tgool: result of controller is not being handled")
 	return nil
 }
 
@@ -86,13 +86,13 @@ func (m *ControllerMiddleware) getHandler(
 
 	params := make(drouter.Params, 0, 0)
 	currentPath := chatState.GetPath()
-	logrus.Warn("current path: ", currentPath)
+	log.Println("tgool: current path is ", currentPath)
 
 	handle, _ := m.router.Lookup(currentPath, &params)
 	if handle != nil {
 		route := handle.(routeMetadata)
 		if route.hasBody == true {
-			logrus.Info(route.path)
+			log.Println("tgool: ", route.path)
 			method, ok = getMethodByRouteMetadata(&route)
 			return route.path, method, ok
 		}
@@ -101,7 +101,7 @@ func (m *ControllerMiddleware) getHandler(
 	handle, _ = m.router.Lookup(ctx.GetRoute(), &params)
 	if handle != nil {
 		route := handle.(routeMetadata)
-		logrus.Info(route.path)
+		log.Println("tgool: ", route.path)
 		method, ok = getMethodByRouteMetadata(&route)
 		return route.path, method, ok
 	}
@@ -115,8 +115,8 @@ func getMethodByRouteMetadata(route *routeMetadata) (method reflect.Value, ok bo
 		MethodByName(route.method)
 
 	if !method.IsValid() {
-		logrus.Debug(
-			fmt.Sprintf("method %s is invalid", route.method),
+		log.Println(
+			fmt.Sprintf("tgool: method %s is invalid", route.method),
 		)
 		return method, false
 	}

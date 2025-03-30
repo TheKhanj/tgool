@@ -1,8 +1,6 @@
 package tgool
 
-import (
-	"github.com/sirupsen/logrus"
-)
+import "log"
 
 type Router struct {
 	middlewares []Middleware
@@ -17,7 +15,7 @@ func NewRouter(
 }
 
 func (r *Router) Route(ctx Context) {
-	logrus.Info("[telegram] handling message")
+	log.Println("tgool: handling new message")
 
 	for _, middleware := range r.middlewares {
 		nextCalled := false

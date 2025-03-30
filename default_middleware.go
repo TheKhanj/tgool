@@ -1,8 +1,9 @@
 package tgool
 
 import (
+	"log"
+
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/sirupsen/logrus"
 )
 
 type DefaultMiddleWare struct{}
@@ -13,7 +14,7 @@ func (m *DefaultMiddleWare) Handle(
 	ctx Context,
 	next func(),
 ) tg.Chattable {
-	logrus.Info("[DefaultMiddleware] no route matched")
+	log.Printf("tgool: default-middleware: no route matched (%s)", ctx.GetRoute())
 
 	return nil
 }
