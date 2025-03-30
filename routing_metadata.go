@@ -1,6 +1,7 @@
 package tgool
 
 import (
+	"log"
 	"path"
 
 	"github.com/thekhanj/drouter"
@@ -15,32 +16,32 @@ type routeMetadata struct {
 	method     string
 }
 
-type RouteBuilder struct {
+type RouterBuilder struct {
 	controller  Controller
 	prefixRoute string
 	metadatas   []routeMetadata
 }
 
-func (r *RouteBuilder) setController(
+func (r *RouterBuilder) setController(
 	controller Controller,
-) *RouteBuilder {
+) *RouterBuilder {
 	r.controller = controller
 
 	return r
 }
 
-func (r *RouteBuilder) SetPrefixRoute(
+func (r *RouterBuilder) SetPrefixRoute(
 	prefixRoute string,
-) *RouteBuilder {
+) *RouterBuilder {
 	r.prefixRoute = prefixRoute
 
 	return r
 }
 
-func (r *RouteBuilder) AddMethod(
+func (r *RouterBuilder) AddMethod(
 	route string,
 	methodName string,
-) *RouteBuilder {
+) *RouterBuilder {
 	path := path.Join(r.prefixRoute, route)
 	r.metadatas = append(r.metadatas, routeMetadata{
 		path:       path,
@@ -53,22 +54,23 @@ func (r *RouteBuilder) AddMethod(
 	return r
 }
 
-func (r *RouteBuilder) WithTitle(title string) *RouteBuilder {
+func (r *RouterBuilder) WithTitle(title string) *RouterBuilder {
 	r.metadatas[len(r.metadatas)-1].title = title
 
 	return r
 }
 
-func (r *RouteBuilder) WithBody() *RouteBuilder {
+func (r *RouterBuilder) WithBody() *RouterBuilder {
 	r.metadatas[len(r.metadatas)-1].hasBody = true
 
 	return r
 }
 
-func (r *RouteBuilder) Build() *drouter.Router {
+func (r *RouterBuilder) Build() *drouter.Router {
 	router := drouter.New()
 
 	for _, metadata := range r.metadatas {
+		log.Printf("tgool: added route %s", metadata.path)
 		router.AddRoute(metadata.path, metadata)
 	}
 

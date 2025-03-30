@@ -18,26 +18,24 @@ var _ Middleware = &ControllerMiddleware{}
 func NewControllerMiddleware(
 	controllers ...Controller,
 ) *ControllerMiddleware {
-	builder := RouteBuilder{
+	routeBuilder := RouterBuilder{
 		prefixRoute: "/",
 	}
 
 	for _, controller := range controllers {
-		controller.AddRoutes(builder.setController(controller))
+		controller.AddRoutes(routeBuilder.setController(controller))
 	}
 
-	router := builder.Build()
+	router := routeBuilder.Build()
 
-	return &ControllerMiddleware{
-		router: router,
-	}
+	return &ControllerMiddleware{router}
 }
 
-func (m *ControllerMiddleware) Handle(
+func (this *ControllerMiddleware) Handle(
 	ctx Context,
 	next func(),
 ) tg.Chattable {
-	path, method, methodFound := m.getHandler(ctx)
+	path, method, methodFound := this.getHandler(ctx)
 
 	if !methodFound {
 		next()
@@ -46,10 +44,10 @@ func (m *ControllerMiddleware) Handle(
 
 	ctx.ChatsState().GetChat(ctx.GetChatId()).SetPath(path)
 
-	return m.callMethod(ctx, method)
+	return this.callMethod(ctx, method)
 }
 
-func (m *ControllerMiddleware) callMethod(
+func (this *ControllerMiddleware) callMethod(
 	ctx Context,
 	method reflect.Value,
 ) tg.Chattable {
@@ -76,7 +74,7 @@ func (m *ControllerMiddleware) callMethod(
 	return nil
 }
 
-func (m *ControllerMiddleware) getHandler(
+func (this *ControllerMiddleware) getHandler(
 	ctx Context,
 ) (path string, method reflect.Value, ok bool) {
 	chatId := ctx.GetChatId()
@@ -86,9 +84,9 @@ func (m *ControllerMiddleware) getHandler(
 
 	params := make(drouter.Params, 0, 0)
 	currentPath := chatState.GetPath()
-	log.Println("tgool: current path is ", currentPath)
+	log.Printf("tgool: current path is %s", currentPath)
 
-	handle, _ := m.router.Lookup(currentPath, &params)
+	handle, _ := this.router.Lookup(currentPath, &params)
 	if handle != nil {
 		route := handle.(routeMetadata)
 		if route.hasBody == true {
@@ -98,7 +96,7 @@ func (m *ControllerMiddleware) getHandler(
 		}
 	}
 
-	handle, _ = m.router.Lookup(ctx.GetRoute(), &params)
+	handle, _ = this.router.Lookup(ctx.GetRoute(), &params)
 	if handle != nil {
 		route := handle.(routeMetadata)
 		log.Println("tgool: ", route.path)
