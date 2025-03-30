@@ -1,7 +1,6 @@
 package tgool
 
 import (
-	"errors"
 	"path"
 
 	"github.com/thekhanj/drouter"
@@ -22,7 +21,7 @@ type RouteBuilder struct {
 	metadatas   []routeMetadata
 }
 
-func (r *RouteBuilder) SetController(
+func (r *RouteBuilder) setController(
 	controller Controller,
 ) *RouteBuilder {
 	r.controller = controller
@@ -66,16 +65,12 @@ func (r *RouteBuilder) WithBody() *RouteBuilder {
 	return r
 }
 
-func (r *RouteBuilder) Build() (*drouter.Router, error) {
+func (r *RouteBuilder) Build() *drouter.Router {
 	router := drouter.New()
 
 	for _, metadata := range r.metadatas {
-		if metadata.controller == nil {
-			return nil, errors.New("controller is not set")
-		}
-
 		router.AddRoute(metadata.path, metadata)
 	}
 
-	return router, nil
+	return router
 }

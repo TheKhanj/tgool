@@ -10,30 +10,27 @@ import (
 )
 
 type ControllerMiddleware struct {
-	router     *drouter.Router
+	router *drouter.Router
 }
 
 var _ Middleware = &ControllerMiddleware{}
 
 func NewControllerMiddleware(
 	controllers ...Controller,
-) (*ControllerMiddleware, error) {
+) *ControllerMiddleware {
 	builder := RouteBuilder{
 		prefixRoute: "/",
 	}
 
 	for _, controller := range controllers {
-		controller.AddRoutes(&builder)
+		controller.AddRoutes(builder.setController(controller))
 	}
 
-	router, err := builder.Build()
-	if err != nil {
-		return nil, err
-	}
+	router := builder.Build()
 
 	return &ControllerMiddleware{
 		router: router,
-	}, nil
+	}
 }
 
 func (m *ControllerMiddleware) Handle(
