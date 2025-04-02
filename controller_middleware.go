@@ -83,28 +83,30 @@ func (this *ControllerMiddleware) getHandler(
 	ok = false
 
 	// TODO: this is simply wrong! fix it!!!!
-	params := make(drouter.Params, 0, 20)
+	p := make(drouter.Params, 0, 20)
 	// TODO: this is shit
-	ctx.(*context).params = &params
+	ctx.(*context).params = &p
 	currentPath := chatState.GetPath()
 	log.Printf("tgool: current path is %s", currentPath)
 
-	handle, _ := this.router.Lookup(currentPath, &params)
+	handle, _ := this.router.Lookup(currentPath, &p)
 	if handle != nil {
 		route := handle.(routeMetadata)
 		if route.hasBody == true {
-			log.Println("tgool: ", route.path)
+			log.Println("tgool: incoming request", currentPath)
 			method, ok = getMethodByRouteMetadata(&route)
-			return route.path, method, ok
+			return currentPath, method, ok
 		}
 	}
 
-	handle, _ = this.router.Lookup(ctx.GetRoute(), &params)
+	p = make(drouter.Params, 0, 20)
+	ctx.(*context).params = &p
+	handle, _ = this.router.Lookup(ctx.GetRoute(), &p)
 	if handle != nil {
 		route := handle.(routeMetadata)
-		log.Println("tgool: ", route.path)
+		log.Println("tgool: incoming request", ctx.GetRoute())
 		method, ok = getMethodByRouteMetadata(&route)
-		return route.path, method, ok
+		return ctx.GetRoute(), method, ok
 	}
 
 	return "", method, false
