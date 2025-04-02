@@ -1,6 +1,10 @@
 package tgool
 
-import "log"
+import (
+	"log"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+)
 
 type Router struct {
 	middlewares []Middleware
@@ -32,6 +36,12 @@ func (r *Router) Route(ctx Context) {
 
 		if res != nil {
 			ctx.Bot().Send(res)
+
+			if ctx.Update().CallbackQuery != nil {
+				ctx.Bot().Request(
+					tgbotapi.NewCallback(ctx.Update().CallbackQuery.ID, ""),
+				)
+			}
 		}
 
 		break
