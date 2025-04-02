@@ -82,7 +82,10 @@ func (this *ControllerMiddleware) getHandler(
 
 	ok = false
 
-	params := make(drouter.Params, 0, 0)
+	// TODO: this is simply wrong! fix it!!!!
+	params := make(drouter.Params, 0, 20)
+	// TODO: this is shit
+	ctx.(*context).params = &params
 	currentPath := chatState.GetPath()
 	log.Printf("tgool: current path is %s", currentPath)
 

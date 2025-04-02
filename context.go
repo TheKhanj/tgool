@@ -2,6 +2,7 @@ package tgool
 
 import (
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/thekhanj/drouter"
 )
 
 type Context interface {
@@ -13,6 +14,7 @@ type Context interface {
 	GetChatId() int64
 	GetFrom() *tg.User
 	GetTelegramUserId() int64
+	Params() *drouter.Params
 	// this is shit
 	ChatsState() *chatsState
 }
@@ -21,6 +23,7 @@ type context struct {
 	bot        *tg.BotAPI
 	u          *tg.Update
 	chatsState *chatsState
+	params     *drouter.Params
 }
 
 func (c *context) Bot() *tg.BotAPI {
@@ -92,6 +95,10 @@ func (c *context) GetTelegramUserId() int64 {
 
 func (c *context) ChatsState() *chatsState {
 	return c.chatsState
+}
+
+func (c *context) Params() *drouter.Params {
+	return c.params
 }
 
 var _ Context = &context{}
