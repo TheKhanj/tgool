@@ -1,6 +1,8 @@
 package tgool
 
 import (
+	"log"
+
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -23,6 +25,9 @@ func NewEngine(
 }
 
 func (e *Engine) HandleUpdates(updates tgbotapi.UpdatesChannel) {
+	log.Println("tgool: started handling updates")
+	defer log.Println("tgool: stopped handling updates")
+
 	chatsState := &chatsState{}
 
 	for update := range updates {
