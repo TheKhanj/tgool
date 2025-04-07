@@ -16,5 +16,11 @@ func (m *DefaultMiddleWare) Handle(
 ) tg.Chattable {
 	log.Printf("tgool: default-middleware: no route matched (%s)", ctx.GetRoute())
 
+	if ctx.Update().CallbackQuery != nil {
+		return tg.NewCallback(
+			ctx.Update().CallbackQuery.ID, "",
+		)
+	}
+
 	return nil
 }
